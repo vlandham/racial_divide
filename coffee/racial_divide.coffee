@@ -13,6 +13,7 @@ root.showCity = (cityId) ->
     "dn": {id:"dn", name:"denver", x:2300, y:1000, scale:20000},
     "oc": {id:"oc", name:"ok_city", x:280, y:-600, scale:20000}
     "wc": {id:"wc", name:"wichita", x:200, y:200, scale:20000}
+    "mp": {id:"mp", name:"memphis", x:-2800, y:-900, scale:28000}
   }
 
   data = cities[cityId]
