@@ -2,6 +2,7 @@ root = exports ? this
 
 root.showCity = (cityId) ->
   cities = {
+    "ba": {id:"ba", name:"baltimore", x:-15750, y:3400, scale:57000}
     "mw": {id:"mw", name:"milwaukee", display:"Milwaukee, WI", x:-3300, y:3150, scale:30000},
     "ch": {id:"ch", name:"chicago", x:-2600, y:2050, scale:23000},
     "dy": {id:"dy", name:"dayton", x:-3600, y:1250, scale:22000},
@@ -26,8 +27,8 @@ root.showCity = (cityId) ->
   window.city_view.display_city()
 
 tract_ratio = (tract) ->
-  if tract.P003001 > 20
-    tract.P003003 / tract.P003001
+  if +tract.P003001 > 20
+    +tract.P003003 / +tract.P003001
   else
     0
 
@@ -81,9 +82,18 @@ class CityView
   color_for: (data) =>
     @color(tract_ratio(data))
 
+  opacity_for: (data) =>
+    if +data.P003001 > 20
+      1.0
+    else
+      0.0
+    # if tract_ratio(data) > 0 then 1.0 else 0.0
+    # 1.0
+
   display_city: () =>
     xy = d3.geo.albersUsa()
-      .translate([@x,@y]).scale(@scale)
+      .translate([@x,@y])
+      .scale(@scale)
     path = d3.geo.path().projection(xy)
     @force = d3.layout.force().size([@width, @height])
 
@@ -99,7 +109,10 @@ class CityView
           centroid.y = centroid[1]
           centroid.feature = d
           centroid.tract_data = @csv_data[d.properties["GEOID10"]]
-          nodes.push centroid
+          if centroid.tract_data
+            nodes.push centroid
+          # else
+          #   console.log("skipping tract " + d.properties["GEOID10"])
 
         d3.geom.delaunay(nodes).forEach (d) =>
           links.push(edge(d[0], d[1]))
@@ -138,12 +151,13 @@ class CityView
           .attr("stroke", "#222")
           .attr("stroke-width", 0)
           .attr("stroke-opacity", 0.0)
+          .on("click", (d) -> console.log(d))
 
         node.attr("transform", (d) -> "translate(#{d.x},#{d.y})")
 
         node.transition()
           .duration(1000)
-          .attr("fill-opacity", 1.0)
+          .attr("fill-opacity", (d) => @opacity_for(d.tract_data))
 
         d3.transition().delay(1500).each("end",() => @force.start())
 
