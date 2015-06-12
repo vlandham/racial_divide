@@ -47,9 +47,20 @@ edge = (a, b) ->
   e
 
 class CityView
+
+  resize: () ->
+    p = @vis.node().parentNode
+    targetWidth = +d3.select(p).style("width").replace("px","")
+
+    console.log('resize ' + targetWidth)
+
+    @vis.attr("width", targetWidth)
+    @vis.attr("height", targetWidth / @aspect)
+
   constructor: (@name, @x, @y, @scale) ->
     @width = 800
     @height = 650
+    @aspect = @width / @height
     @csv_data = {}
     @color = null
 
@@ -58,10 +69,13 @@ class CityView
       .attr("id", "vis-svg")
       .attr("width", @width)
       .attr("height", @height)
+      .attr("viewBox", "0 0 #{@width} #{@height}")
+      .attr("preserveAspectRatio", "xMidYMid")
 
     @vis.append("svg:rect")
       .attr("width", @width)
       .attr("height", @height)
+    @resize()
 
   setup_data: (csv) =>
     for tract in csv
@@ -192,3 +206,4 @@ $ ->
   d3.select(window).on('hashchange', hashChange)
 
   hashChange()
+
