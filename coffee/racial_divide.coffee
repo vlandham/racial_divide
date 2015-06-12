@@ -204,6 +204,7 @@ $ ->
     d3.event.preventDefault()
 
   d3.select(window).on('hashchange', hashChange)
+  d3.select("#play").on('click', hashChange)
 
   hashChange()
 
