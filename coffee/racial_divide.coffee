@@ -191,20 +191,20 @@ hashChange = () ->
   cityId = decodeURIComponent(location.hash.substring(1)).trim()
   if(cityId.length == 0)
     cityId = 'mw'
-  $('#cities a').removeClass("active")
-  $('#' + cityId).toggleClass("active")
+  d3.selectAll('#cities a').classed("active", false)
+  d3.select('#' + cityId).classed("active", true)
   root.showCity(cityId)
 
-$ ->
-  d3.select(window).on('hashchange', hashChange)
+d3.select(window).on('hashchange', hashChange)
 
-  d3.selectAll('#cities a').on 'click', (e) ->
-    cityId = $(this).attr("id")
-    location.replace('#' + encodeURIComponent(cityId))
-    d3.event.preventDefault()
+d3.selectAll('#cities a').on 'click', (e) ->
+  # cityId = $(this).attr("id")
+  cityId = d3.select(this).attr("id")
+  location.replace('#' + encodeURIComponent(cityId))
+  d3.event.preventDefault()
 
-  d3.select(window).on('hashchange', hashChange)
-  d3.select("#play").on('click', hashChange)
+d3.select(window).on('hashchange', hashChange)
+d3.select("#play").on('click', hashChange)
 
-  hashChange()
+hashChange()
 
