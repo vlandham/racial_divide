@@ -7797,10 +7797,18 @@ d3 = function() {
   root.showCity = function(cityId) {
     var cities, data;
     cities = {
+      "cr": {
+        id: "cr",
+        name: "charleston",
+        x: -7400,
+        y: -1700,
+        scale: 30000,
+        tract_id: 'GEOID'
+      },
       "ba": {
         id: "ba",
         name: "baltimore",
-        x: -15750,
+        x: -25750,
         y: 3400,
         scale: 57000
       },
@@ -7895,7 +7903,7 @@ d3 = function() {
       window.city_view.remove_vis();
       window.city_view = null;
     }
-    window.city_view = new CityView(data.name, data.x, data.y, data.scale);
+    window.city_view = new CityView(data.name, data.x, data.y, data.scale, data);
     return window.city_view.display_city();
   };
 
@@ -7938,11 +7946,12 @@ d3 = function() {
       return this.vis.attr("height", targetWidth / this.aspect);
     };
 
-    function CityView(name, x, y, scale) {
+    function CityView(name, x, y, scale, data1) {
       this.name = name;
       this.x = x;
       this.y = y;
       this.scale = scale;
+      this.data = data1;
       this.display_city = bind(this.display_city, this);
       this.opacity_for = bind(this.opacity_for, this);
       this.color_for = bind(this.color_for, this);
@@ -7997,7 +8006,12 @@ d3 = function() {
       this.force = d3.layout.force().size([this.width, this.height]);
       return d3.csv("data/cities/" + this.name + "_race.csv", (function(_this) {
         return function(csv) {
+          var tract_id;
           _this.setup_data(csv);
+          tract_id = _this.data.tract_id;
+          if (!tract_id) {
+            tract_id = 'GEOID10';
+          }
           return d3.json("data/cities/" + _this.name + "_tracts.json", function(tracts) {
             var links, node, nodes, tick_count;
             nodes = [];
@@ -8008,9 +8022,11 @@ d3 = function() {
               centroid.x = centroid[0];
               centroid.y = centroid[1];
               centroid.feature = d;
-              centroid.tract_data = _this.csv_data[d.properties["GEOID10"]];
+              centroid.tract_data = _this.csv_data[d.properties[tract_id]];
               if (centroid.tract_data) {
                 return nodes.push(centroid);
+              } else {
+                return console.log("skipping tract " + d.properties[tract_id]);
               }
             });
             d3.geom.delaunay(nodes).forEach(function(d) {

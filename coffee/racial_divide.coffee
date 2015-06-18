@@ -2,7 +2,8 @@ root = exports ? this
 
 root.showCity = (cityId) ->
   cities = {
-    "ba": {id:"ba", name:"baltimore", x:-15750, y:3400, scale:57000}
+    "cr": {id:"cr", name:"charleston", x:-7400, y:-1700, scale:30000, tract_id:'GEOID'},
+    "ba": {id:"ba", name:"baltimore", x:-25750, y:3400, scale:57000},
     "mw": {id:"mw", name:"milwaukee", display:"Milwaukee, WI", x:-3300, y:3150, scale:30000},
     "ch": {id:"ch", name:"chicago", x:-2600, y:2050, scale:23000},
     "dy": {id:"dy", name:"dayton", x:-3600, y:1250, scale:22000},
@@ -23,7 +24,7 @@ root.showCity = (cityId) ->
     window.city_view.remove_vis()
     window.city_view = null
 
-  window.city_view = new CityView data.name, data.x, data.y, data.scale
+  window.city_view = new CityView data.name, data.x, data.y, data.scale, data
   window.city_view.display_city()
 
 tract_ratio = (tract) ->
@@ -57,7 +58,7 @@ class CityView
     @vis.attr("width", targetWidth)
     @vis.attr("height", targetWidth / @aspect)
 
-  constructor: (@name, @x, @y, @scale) ->
+  constructor: (@name, @x, @y, @scale, @data) ->
     @width = 800
     @height = 650
     @aspect = @width / @height
@@ -113,6 +114,9 @@ class CityView
 
     d3.csv "data/cities/#{@name}_race.csv", (csv) =>
       @setup_data(csv)
+      tract_id = @data.tract_id
+      if !tract_id
+        tract_id = 'GEOID10'
       d3.json "data/cities/#{@name}_tracts.json", (tracts) =>
         nodes = []
         links = []
@@ -122,11 +126,11 @@ class CityView
           centroid.x = centroid[0]
           centroid.y = centroid[1]
           centroid.feature = d
-          centroid.tract_data = @csv_data[d.properties["GEOID10"]]
+          centroid.tract_data = @csv_data[d.properties[tract_id]]
           if centroid.tract_data
             nodes.push centroid
-          # else
-          #   console.log("skipping tract " + d.properties["GEOID10"])
+          else
+            console.log("skipping tract " + d.properties[tract_id])
 
         d3.geom.delaunay(nodes).forEach (d) =>
           links.push(edge(d[0], d[1]))
