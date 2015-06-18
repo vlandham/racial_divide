@@ -7808,7 +7808,7 @@ d3 = function() {
       "ba": {
         id: "ba",
         name: "baltimore",
-        x: -25750,
+        x: -15750,
         y: 3400,
         scale: 57000
       },

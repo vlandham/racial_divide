@@ -3,7 +3,7 @@ root = exports ? this
 root.showCity = (cityId) ->
   cities = {
     "cr": {id:"cr", name:"charleston", x:-7400, y:-1700, scale:30000, tract_id:'GEOID'},
-    "ba": {id:"ba", name:"baltimore", x:-25750, y:3400, scale:57000},
+    "ba": {id:"ba", name:"baltimore", x:-15750, y:3400, scale:57000},
     "mw": {id:"mw", name:"milwaukee", display:"Milwaukee, WI", x:-3300, y:3150, scale:30000},
     "ch": {id:"ch", name:"chicago", x:-2600, y:2050, scale:23000},
     "dy": {id:"dy", name:"dayton", x:-3600, y:1250, scale:22000},
